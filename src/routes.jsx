@@ -4,15 +4,16 @@ import Root from "./pages/Root";
 import CoinId from "./pages/CoinId";
 import Favorites from "./pages/Favorites";
 
-
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Root />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/coin/:id" element={<CoinId />} />
-        <Route path="/favorites" element={<Favorites />} />
+        <Route path="/" element={<Root />}>
+          <Route index element={<Home />} />       
+          <Route path="home" element={<Home />} /> 
+          <Route path="coin/:slug" element={<CoinId />} />
+          <Route path="favorites" element={<Favorites />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -1,18 +1,24 @@
-import { Link } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 
 function Root() {
   return (
-    <div className="root">
-      <h1>Welcome to the Root Page</h1>
-      <p>This is the root page of your Cripto application.</p>
-      <nav>
-        <ul>
-          <li><Link to="/home">Home</Link></li>
-          <li><Link to="/favorites">Favorites</Link></li>
-        </ul>
+    <div>
+      <nav style={{ padding: "10px", backgroundColor: "#eee" }}>
+        <Link to="/">Home</Link> |{" "}
+        <Link to="/favorites">Favorites</Link>
       </nav>
+
+      <main style={{ padding: "20px" }}>
+        {}
+        <Outlet />
+      </main>
+
+      <footer style={{ padding: "10px", backgroundColor: "#eee", marginTop: "20px" }}>
+        <p>© 2025 Mi App de Criptomonedas</p>
+      </footer>
     </div>
   );
 }
 
 export default Root;
+
