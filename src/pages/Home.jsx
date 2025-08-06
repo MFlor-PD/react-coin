@@ -1,42 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-
-// Componente separado para la card de criptomoneda
-function CardCrypto({ id, rank, name, priceUsd, isFavorite, onToggleFavorite }) {
-  return (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-        padding: "15px",
-        marginBottom: "10px",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-        maxWidth: "300px",
-        backgroundColor: "#fff",
-      }}
-    >
-      <h2 style={{ margin: "0 0 10px" }}>
-        {rank}. {name}
-      </h2>
-      <p style={{ fontSize: "18px", fontWeight: "bold", margin: 0 }}>
-        ${parseFloat(priceUsd).toFixed(2)}
-      </p>
-      <button onClick={() => onToggleFavorite(id)} style={{ marginTop: "10px" }}>
-        {isFavorite ? "🪙 Quitar de favoritos" : "🪙 Añadir a favoritos"}
-      </button>
-      <Link
-        to={`/coin/${id}`}
-        style={{ display: "block", marginTop: "10px", textDecoration: "underline", color: "blue" }}
-      >
-        Ver detalles
-      </Link>
-    </div>
-  );
-}
+import CardCripto from "../components/CardCripto";
 
 function Home() {
   const [cryptos, setCryptos] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState(() => {
     return JSON.parse(localStorage.getItem("favorites")) || [];
   });
@@ -44,6 +12,7 @@ function Home() {
   useEffect(() => {
     async function fetchCryptos() {
       try {
+        setLoading(true);
         const response = await fetch(`https://rest.coincap.io/v3/assets?limit=10`, {
           headers: {
             Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
@@ -57,6 +26,8 @@ function Home() {
         setCryptos(data.data);
       } catch (error) {
         setError(error.message);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -74,21 +45,31 @@ function Home() {
     localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
   }
 
+  if (loading) {
+    return (
+      <div className="loading-state">
+        <h2>⚡ Cargando criptomonedas...</h2>
+        <p>Obteniendo los datos más recientes del mercado</p>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="error">
-        <h1>Error</h1>
+        <h1>❌ Error de Conexión</h1>
         <p>{error}</p>
+        <p>Por favor, verifica tu conexión a internet e intenta nuevamente.</p>
       </div>
     );
   }
 
   return (
     <div className="home">
-      <h1>Top 10 Criptomonedas</h1>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
+      <h1 className="page-title">🚀 Top 10 Criptomonedas</h1>
+      <div className="crypto-container">
         {cryptos.map((coin) => (
-          <CardCrypto
+          <CardCripto
             key={coin.id}
             id={coin.id}
             rank={coin.rank}
