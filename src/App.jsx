@@ -1,9 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Root from "../Root";
-import Home from "../Home";
-import Favorites from "../Favorites";
-import CoinId from "../CoinId";
-import './styles/components.css';
+import Root from "./pages/Root";
+import Home from "./pages/Home";
+import Favorites from "./pages/Favorites";
+import CoinId from "./pages/CoinId";
 
 function App() {
   return (

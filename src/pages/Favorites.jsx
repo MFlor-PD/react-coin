@@ -9,6 +9,7 @@ function Favorites() {
   useEffect(() => {
     async function fetchFavorites() {
       try {
+        setLoading(true);
         const storedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
         if (storedFavorites.length === 0) {
@@ -33,9 +34,9 @@ function Favorites() {
         const filteredFavorites = data.data.filter((coin) => storedFavorites.includes(coin.id));
 
         setFavorites(filteredFavorites);
-        setLoading(false);
       } catch (err) {
         setError(err.message);
+      } finally {
         setLoading(false);
       }
     }
@@ -54,71 +55,73 @@ function Favorites() {
     setFavorites(prev => prev.filter(coin => coin.id !== id));
   }
 
-  function CardCrypto({ rank, name, priceUsd, onRemove }) {
+  function FavoriteCard({ coin, onRemove }) {
     return (
-      <div
-        style={{
-          border: "1px solid #ddd",
-          borderRadius: "8px",
-          padding: "15px",
-          marginBottom: "10px",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-          maxWidth: "300px",
-          backgroundColor: "#fff",
-          position: "relative",
-        }}
-      >
-        <h2 style={{ margin: "0 0 10px" }}>
-          {rank}. {name}
-        </h2>
-        <p style={{ fontSize: "18px", fontWeight: "bold", margin: 0 }}>
-          ${parseFloat(priceUsd).toFixed(2)}
-        </p>
-        <button
-          onClick={onRemove}
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            backgroundColor: "#e74c3c",
-            border: "none",
-            color: "white",
-            borderRadius: "4px",
-            padding: "5px 10px",
-            cursor: "pointer",
-          }}
-          aria-label={`Eliminar ${name} de favoritos`}
-        >
-          Eliminar
-        </button>
+      <div className="card-cripto">
+        <div className="card-header">
+          <h2>
+            {coin.rank}. {coin.name}
+          </h2>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              onRemove(coin.id);
+            }}
+            className="remove-fav-btn"
+            aria-label={`Eliminar ${coin.name} de favoritos`}
+          >
+            ✕
+          </button>
+        </div>
+        <p className="price">${parseFloat(coin.priceUsd).toFixed(2)}</p>
+        <Link className="details-link" to={`/coin/${coin.id}`}>
+          Ver detalles
+        </Link>
       </div>
     );
   }
 
-  if (loading) return <p>Cargando favoritos...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (favorites.length === 0) return <p>No hay criptomonedas favoritas.</p>;
+  if (loading) {
+    return (
+      <div className="loading-state">
+        <h2>⭐ Cargando favoritos...</h2>
+        <p>Obteniendo tus criptomonedas favoritas</p>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="error">
+        <h1>❌ Error</h1>
+        <p>{error}</p>
+        <p>No se pudieron cargar tus favoritos. Intenta nuevamente.</p>
+      </div>
+    );
+  }
+  
+  if (favorites.length === 0) {
+    return (
+      <div className="empty-state">
+        <h2>💫 No hay favoritos aún</h2>
+        <p>Ve a la página principal y agrega algunas criptomonedas a tus favoritos</p>
+        <Link to="/" className="details-link">
+          🏠 Ir al inicio
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h1>Criptomonedas Favoritas</h1>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
+    <div className="favorites">
+      <h1 className="page-title">⭐ Mis Favoritos</h1>
+      <div className="crypto-container">
         {favorites.map((coin) => (
-          <Link
+          <FavoriteCard
             key={coin.id}
-            to={`/coin/${coin.id}`}
-            style={{ textDecoration: "none", color: "inherit", flex: "1 0 300px", position: "relative" }}
-          >
-            <CardCrypto
-              rank={coin.rank}
-              name={coin.name}
-              priceUsd={coin.priceUsd}
-              onRemove={(e) => {
-                e.preventDefault(); // para evitar que el link se active al clicar el botón
-                handleRemoveFavorite(coin.id);
-              }}
-            />
-          </Link>
+            coin={coin}
+            onRemove={handleRemoveFavorite}
+          />
         ))}
       </div>
     </div>
