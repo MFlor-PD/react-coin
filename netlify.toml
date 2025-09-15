@@ -1,0 +1,6 @@
+[build]
+  publish = "dist"        # carpeta donde está tu web ya compilada
+  command = "npm run build"  # el comando que hace tu build (si lo necesitas)
+
+[[plugins]]
+  package = "netlify-plugin-sitemap"
